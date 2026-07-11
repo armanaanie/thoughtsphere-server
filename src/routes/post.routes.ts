@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { PostController } from '../controllers/post.controller'
+import { CommentController } from '../controllers/comment.controller'
 import { auth } from '../middleware/auth'
 import { validateRequest } from '../middleware/validateRequest'
 import {
@@ -7,6 +8,10 @@ import {
   updatePostValidationSchema,
   getPostsValidationSchema,
 } from '../interfaces/post.validation'
+import {
+  createCommentValidationSchema,
+  getCommentsValidationSchema,
+} from '../interfaces/comment.validation'
 
 const router = Router()
 
@@ -21,5 +26,19 @@ router.patch(
 )
 router.delete('/:id', auth(), PostController.deletePost)
 router.post('/:id/like', auth(), PostController.toggleLike)
+
+// Comments nested under their post
+router.get(
+  '/:postId/comments',
+  auth(),
+  validateRequest(getCommentsValidationSchema),
+  CommentController.getCommentsForPost
+)
+router.post(
+  '/:postId/comments',
+  auth(),
+  validateRequest(createCommentValidationSchema),
+  CommentController.createComment
+)
 
 export const PostRoutes = router
